@@ -1,31 +1,33 @@
+package lab2.ex1;
+
 public class Buffer {
-    private String message;
+    private Message message;
     private boolean isEmpty = true;
 
-    public synchronized void put(String message) {
+    public synchronized void put(Message message) {
         while (!isEmpty) {
             try {
-                wait(); // Oczekuj, jeśli bufor jest pełny
+                wait(); // Wait until buffer is not full
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
         this.message = message;
         isEmpty = false;
-        notifyAll(); // Powiadom konsumenta, że bufor jest teraz pełny
+        notify(); // show consumer, that buffer is empty
     }
 
-    public synchronized String take() {
+    public synchronized Message take() {
         while (isEmpty) {
             try {
-                wait(); // Oczekuj, jeśli bufor jest pusty
+                wait(); // Wait until buffer is not empty
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
-        String takenMessage = message;
+        Message takenMessage = message;
         isEmpty = true;
-        notifyAll(); // Powiadom producenta, że bufor jest teraz pusty
+        notify(); // Inform producer that buffer is not empty
         return takenMessage;
     }
 }
