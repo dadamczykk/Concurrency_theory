@@ -2,38 +2,43 @@ package lab2.ex3;
 
 import lab2.ex1.Message;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Buffer {
-    private Message message;
-    private boolean isEmpty = true;
+    private final List<Message> messages;
+    private final int bufferSize;
+    private int messagesInBuffer;
+
+    public Buffer(int bufferSize){
+        this.bufferSize = bufferSize;
+        this.messages = new ArrayList<>(bufferSize);
+    }
 
     public synchronized void put(Message message) {
 
-//        System.out.println("inside put");
-        while (!isEmpty) {
+        while (messagesInBuffer == bufferSize) {
             try {
-//                System.out.println("not empty");
                 wait(); // Wait until buffer is not full
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
-        this.message = message;
-        isEmpty = false;
+        this.messages.add(message);
+        this.messagesInBuffer++;
         notifyAll(); // show consumer, that buffer is empty
     }
 
     public synchronized Message take() {
-//        System.out.println("inside take");
-        while (isEmpty) {
+        while (messagesInBuffer == 0) {
             try {
-//                System.out.println("is empty");
                 wait(); // Wait until buffer is not empty
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
-        Message takenMessage = message;
-        isEmpty = true;
+        messagesInBuffer--;
+        Message takenMessage = messages.remove(messagesInBuffer);
         notifyAll(); // Inform producer that buffer is not empty
         return takenMessage;
     }
