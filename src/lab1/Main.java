@@ -1,3 +1,5 @@
+package lab1;
+
 public class Main{
 
     public static int counter = 0;

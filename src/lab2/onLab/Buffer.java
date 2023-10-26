@@ -1,33 +1,33 @@
-package lab2.ex1;
+package lab2.onLab;
 
 public class Buffer {
-    private Message message;
+    private int message;
     private boolean isEmpty = true;
 
-    public synchronized void produce(Message message) {
+    public synchronized void produce(int message) {
         while (!isEmpty) {
             try {
-                wait(); // Wait until buffer is not full
+                wait();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
         this.message = message;
         isEmpty = false;
-        notify(); // show consumer, that buffer is empty
+        notify();
     }
 
-    public synchronized Message consume() {
+    public synchronized int consume() {
         while (isEmpty) {
             try {
-                wait(); // Wait until buffer is not empty
+                wait();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
-        Message takenMessage = message;
+        int takenMessage = message;
         isEmpty = true;
-        notify(); // Inform producer that buffer is not empty
+        notify();
         return takenMessage;
     }
 }

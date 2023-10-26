@@ -1,4 +1,4 @@
-package lab2.ex1;
+package lab2.onLab;
 
 public class Consumer implements Runnable {
     private final Buffer buffer;
@@ -11,10 +11,11 @@ public class Consumer implements Runnable {
 
     public void run() {
 
-        for(int i = 0; i < Main.messagesNumber; i++) {
-            Message message = buffer.consume();
+        while (true){
+//        for(int i = 0; i < Main.messagesNumber; i++) {
+            int message = buffer.consume();
             System.out.println("[Consumer id " + id +
-                    "] " + message.toString());
+                    "] " + message);
         }
 
     }

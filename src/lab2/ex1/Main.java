@@ -1,6 +1,7 @@
 package lab2.ex1;
 
 public class Main {
+    // One producer, one consumer
     public static int messagesNumber = 1000;
     public static void main(String[] args) {
         Buffer buffer = new Buffer();

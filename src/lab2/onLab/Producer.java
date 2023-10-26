@@ -1,4 +1,4 @@
-package lab2.ex1;
+package lab2.onLab;
 
 public class Producer implements Runnable {
     private final Buffer buffer;
@@ -12,10 +12,13 @@ public class Producer implements Runnable {
 
     public void run() {
 
-        for(int i = 0; i < Main.messagesNumber; i++) {
+        int i = 0;
+        while (true){
+//        for(int i = 0; i < Main.messagesNumber; i++) {
 
-            buffer.produce(new Message(id, i, "some text"));
+            buffer.produce(i);
             System.out.println("[Producer id " + this.id + "] Sending message " + i);
+            i++;
         }
 
     }

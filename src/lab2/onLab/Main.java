@@ -1,10 +1,12 @@
-package lab2.ex2;
+package lab2.onLab;
 
+import lab2.onLab.Consumer;
+import lab2.onLab.Producer;
 
 public class Main {
-    // Multiple producers and consumers;
+    // One producer, one consumer
     public static int messagesNumber = 10;
-    public static int threadsNumber = 10;
+    public static int threadsNumber = 5;
     public static void main(String[] args) {
         Buffer buffer = new Buffer();
         Thread[] consumers = new Thread[threadsNumber];
@@ -24,6 +26,5 @@ public class Main {
                 Thread.currentThread().interrupt();
             }
         }
-
     }
 }

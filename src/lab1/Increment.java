@@ -1,3 +1,5 @@
+package lab1;
+
 public class Increment extends Thread{
     int i;
     int loops;
