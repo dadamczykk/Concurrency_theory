@@ -5,7 +5,7 @@ import java.util.Random;
 public class Main {
     public static void main(String[] args) {
         int M = 10;
-        Buffer buffer = new Buffer(2 * M);
+        Buffer buffer = new Buffer(M);
         int numProducers = 5;
         int numConsumers = 5;
         Random random = new Random();
@@ -18,7 +18,7 @@ public class Main {
             final int producerId = i;
             producerThreads[i] = new Thread(() -> {
                 try {
-                    for (int j = 1; j <= 10; j++) {
+                    for (int j = 1; j <= 100; j++) {
 
                         buffer.produce(random.nextInt(M-1)+1);
                         System.out.println("Producer " + producerId + " produced: " + j);
@@ -31,7 +31,7 @@ public class Main {
             final int consumerId = i;
             consumerThreads[i] = new Thread(() -> {
                 try {
-                    for (int j = 1; j <= 10; j++) {
+                    for (int j = 1; j <= 100; j++) {
                         int item = buffer.consume(random.nextInt(M-1)+1);
                         System.out.println("Consumer " + consumerId + " consumed: " + item);
                     }

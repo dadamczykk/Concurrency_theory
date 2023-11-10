@@ -26,7 +26,7 @@ class Buffer {
     public void produce(int howManyItems) throws InterruptedException {
         lock.lock();
         try {
-            while (2*M - occupied < howManyItems) {
+            while (M - occupied < howManyItems) {
                 producer.await();
             }
             for(int i = 0; i < howManyItems; i++){
