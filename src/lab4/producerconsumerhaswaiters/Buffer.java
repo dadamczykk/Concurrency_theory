@@ -1,4 +1,4 @@
-package lab4.producerconsumerbest;
+package lab4.producerconsumerhaswaiters;
 
 import java.util.LinkedList;
 import java.util.concurrent.locks.Condition;
@@ -6,15 +6,12 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Buffer {
     private final LinkedList<Integer> buffer;
-    private final int bufferCapacity;
+    public final int bufferCapacity;
     private final ReentrantLock lock;
     private final Condition firstProducer;
     private final Condition firstConsumer;
     private final Condition restProducers;
     private final Condition restConsumers;
-
-    private boolean hasFirstProducer = false;
-    private boolean hasFirstConsumer = false;
 
     private int countFirstProducer = 0;
     private int countFirstConsumer = 0;
@@ -32,36 +29,35 @@ public class Buffer {
         this.restProducers = lock.newCondition();
     }
 
-    public void produce(int[] toProduce, int id, Producer pr){
+    public void produce(int[] toProduce, int id){
         lock.lock();
         try {
             countRestProducers++;
-            while(hasFirstProducer){
-                pr.loops++;
-//                System.out.println("PRODUCER id: " + id +
-//                        " waiting on restProducers with " + countRestProducers + " processes");
+            while(lock.hasWaiters(firstProducer)){
+
+                  System.out.println("PRODUCER id: " + id +
+                          " waiting on restProducers | number of waiting processes: " + countRestProducers);
                 restProducers.await();
             }
             countRestProducers--;
             countFirstProducer++;
-            hasFirstProducer = true;
             while (buffer.size() + toProduce.length > bufferCapacity){
 
-//                System.out.println("PRODUCER id: " + id +
-//                        " waiting on firstProducer with " + countFirstProducer + " processes");
+                  System.out.println("PRODUCER id: " + id +
+                          " waiting on firstProducer | number of waiting processes: " + countFirstProducer);
 
                 firstProducer.await();
             }
             countFirstProducer--;
 
-            hasFirstProducer = false;
             for (int j : toProduce) buffer.add(j);
 
-//            System.out.println("PRODUCER id: " + id +
-//                    " added " + toProduce.length + " to buffer");
+            System.out.println("PRODUCER id: " + id +
+                      " added " + toProduce.length + " to buffer");
 
             restProducers.signal();
             firstConsumer.signal();
+
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -70,34 +66,31 @@ public class Buffer {
         }
     }
 
-    public void consume(int toConsume, int id, Consumer cs){
+    public void consume(int toConsume, int id){
         lock.lock();
         try {
             countRestConsumers++;
-            while(hasFirstConsumer){
-                cs.loops++;
-//                System.out.println("CONSUMER id: " + id +
-//                        " waiting on restConsumers with " + countRestConsumers + " processes");
+            while(lock.hasWaiters(firstConsumer)){
+
+                  System.out.println("CONSUMER id: " + id +
+                          " waiting on restConsumers | number of waiting processes: " + countRestConsumers);
 
                 restConsumers.await();
             }
             countRestConsumers--;
             countFirstConsumer++;
-            hasFirstConsumer = true;
             while (buffer.size() - toConsume < 0){
-//                cs.loops++;
-//                System.out.println("CONSUMER id: " + id +
-//                        " waiting on firstConsumer with " + countFirstConsumer + " processes");
+                  System.out.println("CONSUMER id: " + id +
+                          " waiting on firstConsumer | number of waiting processes: " + countFirstConsumer);
 
 
                 firstConsumer.await();
             }
             countFirstConsumer--;
 
-            hasFirstConsumer = false;
             for (int i=0; i < toConsume; i++) buffer.removeFirst();
-//            System.out.println("CONSUMER id: " + id +
-//                    " consumed " + toConsume + " from buffer");
+            System.out.println("CONSUMER id: " + id +
+                      " consumed " + toConsume + " from buffer");
 
             restConsumers.signal();
             firstProducer.signal();

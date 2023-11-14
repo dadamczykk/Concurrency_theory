@@ -2,6 +2,8 @@ package lab3.ex2;
 
 import java.util.Random;
 
+import static java.lang.Thread.sleep;
+
 public class Consumer implements Runnable {
     private final Buffer buffer;
     private final int id;
@@ -14,21 +16,23 @@ public class Consumer implements Runnable {
     public int waitLoops=0;
 
     public void run() {
+        int M = Main.bufferSize;
 
-        for(int i = 0; i < Main.messagesNumber; i++) {
-            Random random = new Random();
-            int message;
-            if (id == 1){
-                message = buffer.take(random.nextInt(2) + Main.bufferSize-2, this);
-            }
-            else {
-                message = buffer.take(random.nextInt(Main.bufferSize - 1) + 1, this);
-            }
-//            System.out.println("[Consumer id " + id + "] consumed " + message);
+        while(true) {
+//            waitLoops++;
+            int val;
 
-            if (i == Main.messagesNumber-1 && id == 1){
-                Main.printWaitingLoops();
+            if (this.id == 1){
+                val = M;
+            } else {
+                val = (int) (Math.random()*(M-1)+1);
             }
+            buffer.take(val, this);
+//            try {
+//                sleep((int) (100));
+//            } catch (InterruptedException e) {
+//                System.out.println(e.getMessage());
+//            }
         }
     }
 

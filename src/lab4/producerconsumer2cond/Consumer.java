@@ -1,4 +1,4 @@
-package lab4.producerconsumerbest;
+package lab4.producerconsumer2cond;
 
 public class Consumer extends Thread {
 
@@ -15,12 +15,16 @@ public class Consumer extends Thread {
 
     public void run(){
         while(true) {
-            buf.consume((int) (Math.random()*(M-1) + 1), id, this);
-            try {
-                sleep((int) (100));
-            } catch (InterruptedException e) {
-                System.out.println(e.getMessage());
-            }
+            loops++;
+            int val;
+
+            if (this.id == 0) { val = M-1; }
+
+            else{ val = (int) (Math.random()*(M-1)+1); }
+
+            buf.consume(val, id);
+
+
         }
     }
 }

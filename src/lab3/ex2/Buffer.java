@@ -25,12 +25,13 @@ public class Buffer {
         try {
             while (messagesInBuffer + toPut > bufferSize) {
                 try {
-                    pr.waitLoops += 1;
+
                     producer.await();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
+            pr.waitLoops += 1;
             this.messagesInBuffer += toPut;
             consumer.signal();
         } finally {
@@ -44,12 +45,13 @@ public class Buffer {
         try{
             while (messagesInBuffer - toTake < 0) {
                 try {
-                    co.waitLoops += 1;
+
                     consumer.await();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
+            co.waitLoops += 1;
             messagesInBuffer -= toTake;
             producer.signal();
             return toTake;

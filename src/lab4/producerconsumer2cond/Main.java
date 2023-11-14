@@ -1,11 +1,11 @@
-package lab4.producerconsumerbest;
+package lab4.producerconsumer2cond;
 
 
 import static java.lang.Thread.sleep;
 
 public class Main {
         public static int messagesNumber = 2000;
-        public static int threadsNumber = 10;
+        public static int threadsNumber = 5;
         public static int bufferSize = 10;
 
         public static Consumer[] consumers = new Consumer[threadsNumber];
@@ -19,7 +19,6 @@ public class Main {
 
             int j = 0;
             while (j < threadsNumber){
-//            j = 0;
                 consumers[j] = new Consumer(buffer, bufferSize, j);
                 producers[j] = new Producer(buffer, bufferSize, j);
                 consumersTh[j] = new Thread(consumers[j]);
@@ -31,35 +30,26 @@ public class Main {
             }
 
             while(true){
-                sleep(5000);
+                sleep(30);
                 printWaitingLoops();
             }
-
-//            for (int i = 0; i < threadsNumber; i++){
-//                try {
-//                    producersTh[i].join();
-//                    consumersTh[i].join();
-//                } catch (InterruptedException e) {
-//                    Thread.currentThread().interrupt();
-//                }
-//            }
 
         }
 
     public static void printWaitingLoops(){
-        System.out.println("**** Statistics of waiting loops ****");
+        System.out.println("**** Number of productions / consumptions ****");
         for (int i = 0; i < threadsNumber; i++){
             if (producers[i] != null){
-                System.out.println("Producer id: " + i + " loops in wait: " + producers[i].loops);
+                System.out.println("Producer id: " + i + " number of executions: " + producers[i].loops);
             }
         }
-        System.out.println("==================================");
+        System.out.println("==========================================");
         for (int i = 0; i < threadsNumber; i++){
             if (consumers[i] != null) {
-                System.out.println("Consumer id: " + i + " loops in wait: " + consumers[i].loops);
+                System.out.println("Consumer id: " + i + " number of executions: " + consumers[i].loops);
             }
         }
-        System.out.println("**** **** **** **** **** **** ****");
+        System.out.println("**** **** **** ****  ****  **** **** **** ****");
     }
 
 

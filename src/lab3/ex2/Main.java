@@ -5,7 +5,7 @@ import static java.lang.Thread.sleep;
 
 public class Main {
     public static int messagesNumber = 1000;
-    public static int threadsNumber = 4;
+    public static int threadsNumber = 5;
     public static int bufferSize = 10;
 
     public static Consumer[] consumers = new Consumer[threadsNumber];
@@ -14,7 +14,7 @@ public class Main {
     public static Thread[] consumersTh = new Thread[threadsNumber];
     public static Thread[] producersTh = new Thread[threadsNumber];
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         Buffer buffer = new Buffer(bufferSize*2);
 
         int j = 0;
@@ -28,21 +28,17 @@ public class Main {
             j++;
         }
 
-        for (int i = 0; i < threadsNumber; i++){
-            try {
-                producersTh[i].join();
-                consumersTh[i].join();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+        while(true){
+            sleep(300);
+            printWaitingLoops();
         }
 
     }
 
     public static void printWaitingLoops(){
         System.out.println("**** Statistics of waiting loops ****");
-        for (int i = 0; i < threadsNumber; i++){
-            if (producers[i] != null){
+            for (int i = 0; i < threadsNumber; i++){
+                if (producers[i] != null){
                 System.out.println("Producer id: " + i + " loops in wait: " + producers[i].getWaitLoops());
             }
         }

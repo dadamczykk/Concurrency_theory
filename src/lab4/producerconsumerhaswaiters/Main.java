@@ -1,4 +1,4 @@
-package lab4.producerconsumer4cond;
+package lab4.producerconsumerhaswaiters;
 
 
 import static java.lang.Thread.sleep;
@@ -30,7 +30,7 @@ public class Main {
             }
 
             while(true){
-                sleep(300);
+                sleep(30);
                 printWaitingLoops();
             }
 

@@ -2,6 +2,8 @@ package lab3.ex2;
 
 import java.util.Random;
 
+import static java.lang.Thread.sleep;
+
 public class Producer implements Runnable {
     private final Buffer buffer;
 
@@ -15,19 +17,22 @@ public class Producer implements Runnable {
 
 
     public void run() {
-
-        for(int i = 0; i < Main.messagesNumber; i++) {
-            Random random = new Random();
-
-            int toPut;
-            if (id == 1){
-                toPut = random.nextInt(2) + Main.bufferSize-2;
+        int M = Main.bufferSize;
+        while(true) {
+//            waitLoops++;
+            int val;
+            if (this.id == 1){
+                val = M;
+            } else {
+                val = (int) (Math.random()*(M-1)+1);
             }
-            else {
-                toPut = random.nextInt(Main.bufferSize - 1) + 1;
-            }
-            buffer.put(toPut, this);
-//            System.out.println("[Producer id " + this.id + "] produced " + toPut);
+
+            buffer.put(val, this);
+//            try {
+//                sleep((int) (100));
+//            } catch (InterruptedException e) {
+//                System.out.println(e.getMessage());
+//            }
         }
     }
 

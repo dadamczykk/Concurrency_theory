@@ -1,113 +1,109 @@
 package lab4.producerconsumer4cond;
 
+import java.util.LinkedList;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Buffer {
-    private final int bufferSize;
-    private int messagesInBuffer;
-
+    private final LinkedList<Integer> buffer;
+    public final int bufferCapacity;
     private final ReentrantLock lock;
-    private final Condition consumers;
-    private final Condition producers;
-
-    private final Condition firstConsumer;
-
     private final Condition firstProducer;
+    private final Condition firstConsumer;
+    private final Condition restProducers;
+    private final Condition restConsumers;
 
-    private boolean hasFirstProducer = false;
-    private boolean hasFirstConsumer = false;
+    private int countFirstProducer = 0;
+    private int countFirstConsumer = 0;
+    private int countRestProducers = 0;
+    private int countRestConsumers = 0;
+    boolean hasFirstProducer = false;
+    boolean hasFirstConsumer = false;
 
-    private int numWaitingProd = 0;
-    private int numWaitingProdFirst = 0;
-    private int numWaitingCons = 0;
-    private int numWaitingConsFirst = 0;
-
-
-    public Buffer(int bufferSize){
-        this.bufferSize = bufferSize;
+    public Buffer(int m){
+        this.buffer = new LinkedList<>();
+        this.bufferCapacity = m * 2;
         this.lock = new ReentrantLock();
-        this.consumers = lock.newCondition();
-        this.producers = lock.newCondition();
         this.firstConsumer = lock.newCondition();
         this.firstProducer = lock.newCondition();
-        this.messagesInBuffer = 0;
+        this.restConsumers = lock.newCondition();
+        this.restProducers = lock.newCondition();
     }
 
-    public void put(int toPut, Producer pr) {
+    public void produce(int[] toProduce, int id){
         lock.lock();
-        System.out.println("inside produce");
         try {
-            numWaitingProd++;
-            while (hasFirstProducer){
-                System.out.println("Producer " + pr.id + " is waiting on condition producers with " + numWaitingProd);
-//                pr.waitLoops++;
-                producers.await();
+            countRestProducers++;
+            while(hasFirstProducer){
+
+                  System.out.println("PRODUCER id: " + id +
+                          " waiting on restProducers | number of waiting processes: " + countRestProducers);
+                restProducers.await();
             }
+            countRestProducers--;
+            countFirstProducer++;
+            hasFirstProducer = true;
+            while (buffer.size() + toProduce.length > bufferCapacity){
 
-            numWaitingProd--;
+                  System.out.println("PRODUCER id: " + id +
+                          " waiting on firstProducer | number of waiting processes: " + countFirstProducer);
 
-            numWaitingProdFirst++;
-            while (messagesInBuffer + toPut > bufferSize){
-//                pr.waitLoops++;
-                System.out.println("Producer " + pr.id + " is waiting on condition First producer " + numWaitingProdFirst);
-                hasFirstProducer = true;
                 firstProducer.await();
-//                hasFirstProducer = false;
             }
-            if (numWaitingProdFirst > 0) numWaitingProdFirst--;
-
-            System.out.println(">> Producer " + pr.id + " put " + toPut);
-            this.messagesInBuffer += toPut;
+            countFirstProducer--;
             hasFirstProducer = false;
-            producers.signal();
+
+            for (int j : toProduce) buffer.add(j);
+
+            System.out.println("PRODUCER id: " + id +
+                      " added " + toProduce.length + " to buffer");
+
+            restProducers.signal();
             firstConsumer.signal();
 
+
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        } finally {
+        } finally{
             lock.unlock();
         }
-
     }
 
-    public synchronized int take(int toTake, Consumer co) {
+    public void consume(int toConsume, int id){
         lock.lock();
-        System.out.println("inside take");
-        try{
-            numWaitingCons++;
-            while (hasFirstConsumer){
-//                co.waitLoops++;
-                System.out.println("Consumer " + co.id + " is waiting on condition consumers with " + numWaitingCons);
-                consumers.await();
+        try {
+            countRestConsumers++;
+            while(hasFirstConsumer){
+
+                  System.out.println("CONSUMER id: " + id +
+                          " waiting on restConsumers | number of waiting processes: " + countRestConsumers);
+
+                restConsumers.await();
             }
-            numWaitingCons--;
+            countRestConsumers--;
+            countFirstConsumer++;
+            hasFirstConsumer = true;
+            while (buffer.size() - toConsume < 0){
+                  System.out.println("CONSUMER id: " + id +
+                          " waiting on firstConsumer | number of waiting processes: " + countFirstConsumer);
 
-            numWaitingConsFirst++;
 
-            while (messagesInBuffer - toTake < 0){
-//                co.waitLoops++;
-                System.out.println("Consumer " + co.id + " is waiting on condition consumer First with " + numWaitingConsFirst + "  " +  numWaitingCons);
-                hasFirstConsumer = true;
                 firstConsumer.await();
             }
-            if (numWaitingConsFirst > 0) numWaitingConsFirst--;
-
-
-            messagesInBuffer -= toTake;
-            System.out.println("<< Consumer " + co.id + " taken " + toTake);
+            countFirstConsumer--;
             hasFirstConsumer = false;
-            consumers.signal();
-            firstProducer.signal();
 
-            return toTake;
+            for (int i=0; i < toConsume; i++) buffer.removeFirst();
+//            System.out.println("CONSUMER id: " + id +
+//                      " consumed " + toConsume + " from buffer");
+
+            restConsumers.signal();
+            firstProducer.signal();
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        } finally {
+        } finally{
             lock.unlock();
-
         }
-
     }
 }
