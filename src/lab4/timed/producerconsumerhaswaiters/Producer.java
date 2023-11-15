@@ -1,5 +1,8 @@
 package lab4.timed.producerconsumerhaswaiters;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Producer extends Thread {
     private final Buffer buf;
     private final int M;
@@ -7,11 +10,16 @@ public class Producer extends Thread {
     private final int id;
 
     public int loops;
+    public List<List<Long>> timesList;
 
     public Producer(Buffer buf, int M, int id)  {
         this.buf = buf;
         this.M = M;
         this.id = id;
+        timesList = new ArrayList<>();
+        for (int i = 0; i <= M; i++){
+            timesList.add(new ArrayList<>());
+        }
 
     }
 
@@ -22,23 +30,22 @@ public class Producer extends Thread {
             loops++;
             int val;
 
-             // normal
-//             if (false){ }
-
-            // producer id 0 starvation
-             if (this.id == 0) { val = M-1; }
-
-            // deadlock situation
-//            if (this.id < 3){ val = 1; }
-            else { val = (int) (Math.random()*(M-1)+1); }
+            val = (int) (Math.random()*(M-1)+1);
 
             int[] a = new int[val];
             for(int i=0; i<a.length; i++) {
                 a[i] = (int)(Math.random() * 10) + 1;
             }
+            long start = System.nanoTime();
             buf.produce(a, id);
+            long elapsed = System.nanoTime() - start;
+            timesList.get(val).add(elapsed);
 
-
+//            try {
+//                sleep(1);
+//            } catch (InterruptedException e) {
+//                throw new RuntimeException(e);
+//            }
         }
     }
 }

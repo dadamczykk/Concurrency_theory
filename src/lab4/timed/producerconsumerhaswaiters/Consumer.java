@@ -1,36 +1,35 @@
 package lab4.timed.producerconsumerhaswaiters;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Consumer extends Thread {
 
     private Buffer buf;
     private final int M;
     private final int id;
     public int loops;
+    public List<List<Long>> timesList;
 
     public Consumer(Buffer buf, int M, int id){
         this.buf = buf;
         this.M = M;
         this.id = id;
+        timesList = new ArrayList<>();
+        for (int i = 0; i <= M; i++){
+            timesList.add(new ArrayList<>());
+        }
     }
 
     public void run(){
         while(true) {
             loops++;
-            int val;
 
-            // normal
-//             if (false){ }
-
-            // consumer id 0 starvation
-             if (this.id == 0) { val = M-1; }
-
-            // deadlock situation
-//            if (this.id < 3){ val = M-1; }
-
-            else{ val = (int) (Math.random()*(M-1)+1); }
-
+            int val = (int) (Math.random()*(M-1)+1);
+            long start = System.nanoTime();
             buf.consume(val, id);
-
+            long elapsed = System.nanoTime() - start;
+            timesList.get(val).add(elapsed);
 
         }
     }

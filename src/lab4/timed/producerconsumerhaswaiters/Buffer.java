@@ -35,16 +35,16 @@ public class Buffer {
             countRestProducers++;
             while(lock.hasWaiters(firstProducer)){
 
-                  System.out.println("PRODUCER id: " + id +
-                          " waiting on restProducers | number of waiting processes: " + countRestProducers);
+//                  System.out.println("PRODUCER id: " + id +
+//                          " waiting on restProducers | number of waiting processes: " + countRestProducers);
                 restProducers.await();
             }
             countRestProducers--;
             countFirstProducer++;
             while (buffer.size() + toProduce.length > bufferCapacity){
 
-                  System.out.println("PRODUCER id: " + id +
-                          " waiting on firstProducer | number of waiting processes: " + countFirstProducer);
+//                  System.out.println("PRODUCER id: " + id +
+//                          " waiting on firstProducer | number of waiting processes: " + countFirstProducer);
 
                 firstProducer.await();
             }
@@ -52,8 +52,8 @@ public class Buffer {
 
             for (int j : toProduce) buffer.add(j);
 
-            System.out.println("PRODUCER id: " + id +
-                      " added " + toProduce.length + " to buffer");
+//            System.out.println("PRODUCER id: " + id +
+//                      " added " + toProduce.length + " to buffer");
 
             restProducers.signal();
             firstConsumer.signal();
@@ -72,16 +72,16 @@ public class Buffer {
             countRestConsumers++;
             while(lock.hasWaiters(firstConsumer)){
 
-                  System.out.println("CONSUMER id: " + id +
-                          " waiting on restConsumers | number of waiting processes: " + countRestConsumers);
+//                  System.out.println("CONSUMER id: " + id +
+//                          " waiting on restConsumers | number of waiting processes: " + countRestConsumers);
 
                 restConsumers.await();
             }
             countRestConsumers--;
             countFirstConsumer++;
             while (buffer.size() - toConsume < 0){
-                  System.out.println("CONSUMER id: " + id +
-                          " waiting on firstConsumer | number of waiting processes: " + countFirstConsumer);
+//                  System.out.println("CONSUMER id: " + id +
+//                          " waiting on firstConsumer | number of waiting processes: " + countFirstConsumer);
 
 
                 firstConsumer.await();
@@ -89,8 +89,8 @@ public class Buffer {
             countFirstConsumer--;
 
             for (int i=0; i < toConsume; i++) buffer.removeFirst();
-            System.out.println("CONSUMER id: " + id +
-                      " consumed " + toConsume + " from buffer");
+//            System.out.println("CONSUMER id: " + id +
+//                      " consumed " + toConsume + " from buffer");
 
             restConsumers.signal();
             firstProducer.signal();

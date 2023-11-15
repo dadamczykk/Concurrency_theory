@@ -24,29 +24,13 @@ public class Consumer extends Thread {
     public void run(){
         while(true) {
             loops++;
-            int val;
 
-            // normal
-//             if (false){ }
-
-            // consumer id 0 starvation
-//             if (this.id == 0) { val = M-1; }
-
-            // deadlock situation
-            if (this.id < 3){ val = M-1; }
-
-            else{ val = (int) (Math.random()*(M-1)+1); }
+            int val = (int) (Math.random()*(M-1)+1);
             long start = System.nanoTime();
             buf.consume(val, id);
             long elapsed = System.nanoTime() - start;
             timesList.get(val).add(elapsed);
 
-
-//            try {
-//                sleep(1);
-//            } catch (InterruptedException e) {
-//                throw new RuntimeException(e);
-//            }
         }
     }
 }

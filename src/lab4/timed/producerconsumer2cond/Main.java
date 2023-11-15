@@ -11,8 +11,8 @@ import static java.lang.Thread.sleep;
 
 public class Main {
         public static int messagesNumber = 2000;
-        public static int threadsNumber = 1000;
-        public static int bufferSize = 10000;
+        public static int threadsNumber = 10;
+        public static int bufferSize = 1000;
 
         public static Consumer[] consumers = new Consumer[threadsNumber];
         public static Producer[] producers = new Producer[threadsNumber];
@@ -38,7 +38,7 @@ public class Main {
             }
 
 //            while(true){
-                sleep(30000);
+                sleep(60000);
                 printAverageTimes();
 //            }
 
@@ -93,7 +93,7 @@ public class Main {
                 getMeans.add(getMean);
                 putMeans.add(putMean);
             }
-        BufferedWriter writer = new BufferedWriter(new FileWriter("times.csv", true));
+        BufferedWriter writer = new BufferedWriter(new FileWriter("times2.csv", true));
         for (int i = 1; i < bufferSize; i++){
                 writer.write("get2cond,"+bufferSize+","+threadsNumber+","+i+","+getMeans.get(i)+"\n");
                 System.out.println("get2cond,"+bufferSize+","+threadsNumber+","+i+","+getMeans.get(i));
